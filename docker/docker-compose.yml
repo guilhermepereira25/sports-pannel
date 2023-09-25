@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  node:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    restart: on-failure
+    volumes:
+      - ../server:/usr/server
+    container_name: sports-backend
+    working_dir: /usr/server
+    ports:
+      - 3000:3000
+      - 9229:9229
+    env_file:
+      - ../server/.env
+    depends_on:
+      - redis
+    networks:
+      - backend
+      - frontend
+    command:
+      sh -c 'npm i && npm start'
+    
+  vue_docker:
+    image: node:alpine
+    container_name: sports-frontend
+    ports:
+      - 8000:8000
+    volumes:
+      - type: bind
+        source: ../client
+        target: /var/www/app/client
+    depends_on:
+      - node
+    tty: true
+    networks:
+      - frontend
+    command:
+      sh -c 'cd /var/www/app/client && npm i && npm run dev'
+      
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - 6379:6379
+    networks:
+      - backend
+    volumes:
+      - redis-data:/var/log/redis
+
+networks:
+  backend:
+    driver: bridge
+  frontend:
+    driver: bridge
+
+volumes:
+  redis-data: {}
