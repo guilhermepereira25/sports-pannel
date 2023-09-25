@@ -51,17 +51,6 @@ describe("handle function", () => {
       url: "/api/get-league?name=premier-league",
     };
 
-    const expectedResponse = {
-      statusCode: 200,
-      body: {
-        success: true,
-        message: null,
-        data: {
-          hello: "world",
-        },
-      },
-    };
-
     const response = await handle(req);
     expect(response.statusCode).toEqual(200);
     expect(response.body.success).toEqual(true);
@@ -73,17 +62,6 @@ describe("handle function", () => {
         host: "localhost:3000",
       },
       url: "/api/get-standings/league/79",
-    };
-
-    const expectedResponse = {
-      statusCode: 200,
-      body: {
-        success: true,
-        message: null,
-        data: {
-          hello: "world",
-        },
-      },
     };
 
     const response = await handle(req);
