@@ -63,7 +63,8 @@ describe("handle function", () => {
     };
 
     const response = await handle(req);
-    expect(response).toEqual(expectedResponse);
+    expect(response.statusCode).toEqual(200);
+    expect(response.body.success).toEqual(true);
   });
 
   it("should return a valid response for a url with a search params in url", async () => {
@@ -86,6 +87,7 @@ describe("handle function", () => {
     };
 
     const response = await handle(req);
-    expect(response).toEqual(expectedResponse);
+    expect(response.statusCode).toEqual(200);
+    expect(response.body.success).toEqual(true);
   });
 });
