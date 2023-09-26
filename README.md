@@ -1,5 +1,9 @@
 # Welcome to Sports Pannel
 
+## BUILD STATUS
+
+![build](https://progress-bar.dev/50/?title=progress)
+
 ## Description
 
 This is a simple project to use caching concepts with Redis and pure NodeJS. The project is a simple API to get infos from a brazilian league.
