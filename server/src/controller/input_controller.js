@@ -1,6 +1,6 @@
 'use strict'
 
-import { getUser } from "./user_controller.js";
+import { login, logout } from "./auth_controller.js";
 import { getLeague, getStandings } from "./api_controller.js";
 import { IncomingMessage } from 'http';
 import { parse } from "url";
@@ -16,14 +16,24 @@ function getRoutes() {
         '/api/get-standings': {
             handler: getStandings
         },
-        '/api/get-user': {
-            handler: getUser
+        '/api/login': {
+            handler: login
         },
+        '/api/logout': {
+            handler: logout
+        }
     }
 }
 
 function verifyUrlParsed(url) {
     const parsedUrl = parse(url, true);
+
+    if (parsedUrl.pathname === '/api/login' || 
+        parsedUrl.pathname === '/api/logout'
+    ) {
+        return parsedUrl.pathname;
+    }
+
     const urlPattern = /^\/api\/get-(.+?)(?:\/(\w+)\/(\w+))?$/;
     const urlMatch = parsedUrl.pathname.match(urlPattern);
 
@@ -49,7 +59,7 @@ function verifyUrlParsed(url) {
 /**
  * @param {IncomingMessage} req
  */
-export async function handle(req) {
+export async function handle(req) {    
     const parsedUrl = verifyUrlParsed(req.url);
 
     if (!parsedUrl) { throw new Error('Invalid request URL'); }
