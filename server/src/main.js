@@ -1,6 +1,7 @@
 import { IncomingMessage, ServerResponse, createServer } from 'http';
 import dotenv from 'dotenv';
 import { handle } from '../src/controller/input_controller.js';
+import session from 'cookie-session';
 dotenv.config();
 
 const defaultHost = process.env.DEFAULT_HOST;
@@ -12,12 +13,20 @@ const appPort = process.env.APP_PORT || 3000; // always use 3000 for dev
  * @param {ServerResponse} res
  */
 async function serve(req, res) {
+    session({
+        name: 'session',
+        keys: [process.env.SESSION_KEY],
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    });
+
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
+    
     try {
         let thisResponseData = await handle(req);
         
         if (thisResponseData) {
             res.setHeader('Content-Type', 'application/json');
-            res.setHeader('Access-Control-Allow-Origin', '*');
             res.statusCode = thisResponseData.statusCode;
             res.end(JSON.stringify(thisResponseData.body));
         }
