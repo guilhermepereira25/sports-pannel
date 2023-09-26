@@ -63,6 +63,12 @@ async function makeRequest(options) {
  * @returns {Object} An object containing the HTTP status code and response body.
  */
 export async function getLeague(req) {
+    if (! req.session.username) {
+        responseBody.statusCode = 401;
+        responseBody.body.message = 'Unauthorized';
+        return responseBody;
+    }
+
     let leagueName = undefined;
     
     if (typeof req.url === 'string') {
@@ -106,6 +112,12 @@ export async function getLeague(req) {
  * @returns {Object} An object containing the HTTP status code and response body.
  */
 export async function getStandings(req) {
+    if (! req.session.username) {
+        responseBody.statusCode = 401;
+        responseBody.body.message = 'Unauthorized';
+        return responseBody;
+    }
+
     let leagueId = undefined;
     
     if (typeof req.url === 'string') {
@@ -126,43 +138,6 @@ export async function getStandings(req) {
     try {
         const data = await makeRequest(options);
         debug(`getStandings data: ${data}`);
-
-        responseBody.statusCode = 200;
-        responseBody.body.data = data.response;
-        responseBody.body.success = true;
-    } catch (err) {
-        console.error(err);
-        responseBody.data = err;
-        responseBody.message = 'error';
-    }
-
-    return responseBody;
-}
-
-async function login(req) {
-    if (req.method !== 'POST') {
-        responseBody.statusCode = 400;
-        responseBody.body.message = 'invalid request method';
-        return responseBody;
-    }
-
-    const { username, password } = req.body;
-
-    if (!username || !password) {
-        responseBody.statusCode = 400;
-        responseBody.body.message = 'username or password is undefined';
-        return responseBody;
-    }
-
-    options.path = '/login';
-    options.params = {
-        username,
-        password,
-    }
-
-    try {
-        const data = await makeRequest(options);
-        debug(`login data: ${data}`);
 
         responseBody.statusCode = 200;
         responseBody.body.data = data.response;
