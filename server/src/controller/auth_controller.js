@@ -62,7 +62,7 @@ export async function login(req) {
             bycrypt.compare(password, defaultUsernameAuth.password)
         ) {
             responseBody.statusCode = 200;
-            responseBody.success = true;
+            responseBody.body.success = true;
             responseBody.body.message = 'success';
             responseBody.body.data = {
                 username,
@@ -97,7 +97,7 @@ export async function logout(req) {
     }
 
     try {
-        req.session.destroy();
+        req.session = null;
         responseBody.body.success = true;
         responseBody.statusCode = 200;
         responseBody.body.message = 'success';
