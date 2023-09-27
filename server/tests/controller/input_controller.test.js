@@ -26,6 +26,9 @@ describe("handle function", () => {
         host: "localhost:3000",
       },
       url: "/api/get-base",
+      session: {
+        username: "demo@app.com"
+      }
     };
 
     const expectedResponse = {
@@ -49,6 +52,9 @@ describe("handle function", () => {
         host: "localhost:3000",
       },
       url: "/api/get-league?name=premier-league",
+      session: {
+        username: "demo@app.com"
+      }
     };
 
     const response = await handle(req);
@@ -62,6 +68,9 @@ describe("handle function", () => {
         host: "localhost:3000",
       },
       url: "/api/get-standings/league/79",
+      session: {
+        username: "demo@app.com"
+      }
     };
 
     const response = await handle(req);
