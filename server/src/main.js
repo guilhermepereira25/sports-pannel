@@ -20,9 +20,16 @@ async function serve(req, res) {
     });
 
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', '*');
     
     try {
+        if (req.method === 'OPTIONS') {
+            res.statusCode = 200;
+            res.end();
+            return;
+        }
+
         let thisResponseData = await handle(req);
         
         if (thisResponseData) {
