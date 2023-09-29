@@ -61,12 +61,15 @@ export async function login(req) {
         if (username === defaultUsernameAuth.username && 
             bycrypt.compare(password, defaultUsernameAuth.password)
         ) {
+            let token = bycrypt.hashSync(username, 10);
+
             responseBody.statusCode = 200;
             responseBody.body.success = true;
             responseBody.body.message = 'success';
             responseBody.body.data = {
                 username,
                 password,
+                token
             };
 
             req.session.username = { username };
