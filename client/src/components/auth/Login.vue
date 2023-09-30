@@ -17,6 +17,13 @@ export default {
             this.clickLoading();
 
             const response = await login(this.form.username, this.form.password);
+
+            if (! response) {
+                this.loading = false;
+                this.error = 'Unknown error ocurred, try again later';
+                return;
+            }
+
             if (response.success === true) {
                 localStorage.setItem('user', JSON.stringify(response.data.username));
                 sessionStorage.setItem('token', response.data.token);
@@ -56,9 +63,9 @@ export default {
             <img class="mb-4" src="../../assets/sports-soccer-svgrepo-com.svg" alt="" width="72" height="57">
 
             <h3>Please, login in sports pannel</h3>
-            <span class="text-danger" v-if="error">
+            <div style="padding: 10px;" class="alert alert-danger" role="alert" v-if="error">
                 {{ error }}
-            </span>
+            </div>
 
             <div class="form-floating">
                 <input type="text" v-model="form.username" placeholder="Username" class="form-control" required />
