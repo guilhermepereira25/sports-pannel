@@ -5,20 +5,17 @@ import axios from 'axios';
 const baseApiUrl = 'http://localhost:3000';
 
 const axiosClient = axios.create({
-    baseURL: 'http://localhost:3000',
+    baseURL: baseApiUrl,
     headers: {
         'Content-Type': 'application/json',
     },
 });
 
-export async function login (username, password) {
-    console.log('auth_service.js: login()');
-
+export async function login(username, password) {
     const response = await axiosClient.post('/api/login', {
         username: username,
         password: password
     }).then(response => {
-        console.log('auth_service.js: login() response: ', response.data);
         return response.data;
     }).catch(error => {
         return error.response;
@@ -27,11 +24,13 @@ export async function login (username, password) {
     return response;
 }
 
-export async function logout () {
-    await axios.post(baseApiUrl + '/api/logout')
+export async function logout() {
+    const response = await axiosClient.post('/api/logout')
     .then(response => {
-        return response;
+        return response.data;
     }).catch(error => {
         return error.response;
     });
+
+    return response;
 }
