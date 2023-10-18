@@ -1,13 +1,7 @@
 'use strict'
 
-import { createClient } from 'redis';
 import { debug } from 'console';
-
-// connection to redis only work like this, check later if createClient doesnt accept host and port objects
-const redisUrl = process.env.REDIS_URL;
-const redisClient = createClient({
-    url: redisUrl
-});
+import { redisClient } from '../config/services/redis.js';
 
 export async function setRedisKey(key, value) {
     debug(`Setting Redis key ${key} to ${value}`);

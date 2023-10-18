@@ -2,20 +2,8 @@
 
 import bycrypt from 'bcrypt';
 import { IncomingMessage } from 'http';
-
-const responseBody = {
-    statusCode: 500,
-    body: {
-        success: false,
-        message: null,
-        data: {},
-    }
-}
-
-const defaultUsernameAuth = {
-    username: process.env.DEFAULT_USERNAME,
-    password: process.env.DEFAULT_PASSWORD,
-}
+import { responseBody } from '../constants/controller/responseBody.js';
+import { defaultUsernameAuth } from '../constants/controller/auth.js';
 
 async function getRequestBody(req) {
     return new Promise((resolve, reject) => {

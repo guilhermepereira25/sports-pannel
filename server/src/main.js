@@ -2,10 +2,8 @@ import { IncomingMessage, ServerResponse, createServer } from 'http';
 import dotenv from 'dotenv';
 import { handle } from '../src/controller/input_controller.js';
 import session from 'cookie-session';
+import { defaultHost, appPort } from './constants/main.js';
 dotenv.config();
-
-const defaultHost = process.env.DEFAULT_HOST;
-const appPort = process.env.APP_PORT || 3000; // always use 3000 for dev
 
 /**
  * 

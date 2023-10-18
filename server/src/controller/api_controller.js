@@ -3,42 +3,19 @@
 import { debug } from 'console';
 import { IncomingMessage } from 'http';
 import { parse } from "url";
+import { setRedisKey, getRedisKey } from '../services/redis_services.js';
+import { options } from '../constants/controller/options.js';
+import { responseBody } from '../constants/controller/responseBody.js';
+import { leagues } from '../constants/controller/leagues.js';
 
-const options = {
-    url: process.env.API_ENDPOINT, 
-    path: '', // path is set in the function that calls this
-    params: {}, // params are set in the function that calls this
-    method: 'GET', // is never a post request so setting this to GET
-    headers: {
-        'Content-Type': 'application/json',
-        'X-RapidAPI-Host': process.env.API_RAPIDAPI_HOST,
-        'X-RapidAPI-Key': process.env.API_RAPIDAPI_KEY,
-    },
-}
-
-const responseBody = {
-    statusCode: 500,
-    body: {
-        success: false,
-        message: null,
-        data: {},
-    }
-}
-
-const leagues = [
-    'Brasileirão',
-    'Premier League',
-    'La Liga'
-];
-
-async function makeRequest(options) {
-    let url = options.url + options.path;
+async function makeRequest(requestParams) {
+    let url = requestParams.url + requestParams.path;
 
     try {
         const response = await fetch(url, {
-            method: options.method,
-            headers: options.headers,
-            params: options.params,
+            method: requestParams.method,
+            headers: requestParams.headers,
+            params: requestParams.params,
         });
 
         debug(`makeRequest response: ${response}`);
@@ -89,13 +66,26 @@ export async function getLeague(req) {
             return responseBody;
         }
 
-        options.path = '/leagues';
-        options.params = {
-            name: leagueName,
+        const redisData = await getRedisKey(leagueName);
+
+        if (! redisData) {
+            options.path = '/leagues';
+            options.params = {
+                name: leagueName,
+            }
+        
+            const data = await makeRequest(options);
+
+            try {
+                await setRedisKey(leagueName, JSON.stringify(data.response));
+            } catch (err) {
+                console.error(err);
+                responseBody.data = err;
+                responseBody.message = 'error';
+                return responseBody;
+            }
         }
-    
-        const data = await makeRequest(options);
-    
+
         responseBody.statusCode = 200;
         responseBody.body.data = data.response;
         responseBody.body.success = true;
@@ -130,23 +120,32 @@ export async function getStandings(req) {
 
     if (leagueId === undefined) { return { statusCode: 400, body: 'league_id is undefined' } };
 
-    options.path = '/standings';
-    options.params = {
-        league: leagueId,
+    let responseData = undefined;
+    const redisData = await getRedisKey(leagueId);
+
+    if (! redisData) {
+        options.path = '/standings';
+        options.params = {
+            league: leagueId,
+        }
+
+        try {
+            const data = await makeRequest(options);
+            responseData = data.response;
+            await setRedisKey(leagueId, JSON.stringify(data.response));
+            debug(`getStandings data: ${data}`);
+        } catch (err) {
+            console.error(err);
+            responseBody.data = err;
+            responseBody.message = 'error';
+            return responseBody;
+        }
+    } else {
+        responseData = redisData;
     }
 
-    try {
-        const data = await makeRequest(options);
-        debug(`getStandings data: ${data}`);
-
-        responseBody.statusCode = 200;
-        responseBody.body.data = data.response;
-        responseBody.body.success = true;
-    } catch (err) {
-        console.error(err);
-        responseBody.data = err;
-        responseBody.message = 'error';
-    }
-
+    responseBody.statusCode = 200;
+    responseBody.body.data = responseData;
+    responseBody.body.success = true;
     return responseBody;
 }
